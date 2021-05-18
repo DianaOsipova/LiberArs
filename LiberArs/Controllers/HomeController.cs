@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 
 namespace LiberArs.Controllers
 {
@@ -8,7 +9,8 @@ namespace LiberArs.Controllers
         [Authorize]
         public IActionResult Index()
         {
-            return Content(User.Identity.Name);
+            //  return Content(User.Identity.Name);
+            return View();
         }
     }
 }

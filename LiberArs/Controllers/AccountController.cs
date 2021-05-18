@@ -26,9 +26,9 @@ namespace LiberArs.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginModel model)
         {
-            if (ModelState.IsValid)
+            if (model.Email != null && model.Password != null)
             {
-                User user = await db.Users.FirstOrDefaultAsync(u => (u.Email == model.Email || u.UserName == model.UserName) && u.Password == model.Password);
+                User user = await db.Users.FirstOrDefaultAsync(u => u.Email == model.Email  && u.Password == model.Password);
                 if (user != null)
                 {
                     if (model.Email != null)
