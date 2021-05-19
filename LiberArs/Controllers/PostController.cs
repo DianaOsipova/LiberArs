@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using LiberArs.Models;
 using Microsoft.AspNetCore.Hosting;
 using System.IO;
+using Microsoft.AspNetCore.Authorization;
+
 
 namespace LiberArs.Controllers
 {
@@ -23,6 +25,8 @@ namespace LiberArs.Controllers
         }
 
         // GET: Post
+        [Authorize]
+
         public async Task<IActionResult> Index()
         {
             var userContext = _context.Posts.Include(p => p.User);
@@ -33,6 +37,8 @@ namespace LiberArs.Controllers
         }
 
         // GET: Post/Details/5
+        [Authorize]
+
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -52,6 +58,7 @@ namespace LiberArs.Controllers
         }
 
         // GET: Post/Create
+        [Authorize]
         public IActionResult Create()
         {
             ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id");
@@ -61,8 +68,10 @@ namespace LiberArs.Controllers
         // POST: Post/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+
+        [Authorize]
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        [ValidateAntiForgeryToken] //это защита от подделки межсайтовых запростов( мол когда с другого сайта идёт запрос к тебе на сайт)
         public async Task<IActionResult> Create([Bind("PostId,Theme,ImageFile,DateTime")] Post post)
         {
             if (ModelState.IsValid)
@@ -90,7 +99,8 @@ namespace LiberArs.Controllers
             return View(post);
         }
 
-        // GET: Post/Edit/5
+        // GET: Post/Edit/5      
+        [Authorize]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -112,7 +122,9 @@ namespace LiberArs.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("PostId,Theme,Name,DateTime")] Post post)
+        [Authorize]
+
+        public async Task<IActionResult> Edit(int id, [Bind("PostId,Theme,ImageFile,DateTime, UserId")] Post post)
         {
             if (id != post.PostId)
             {
@@ -121,6 +133,21 @@ namespace LiberArs.Controllers
 
             if (ModelState.IsValid)
             {
+
+                //save image to wwwroot/image
+                string wwwRootPath = _hostEnvironment.WebRootPath;
+                string fileName = Path.GetFileNameWithoutExtension(post.ImageFile.FileName);
+                string extension = Path.GetExtension(post.ImageFile.FileName);
+                post.ImageName = fileName = fileName + DateTime.Now.ToString("yymmssfff") + extension;
+                string path = Path.Combine(wwwRootPath + "/Image/", fileName);
+                using (var fileStream = new FileStream(path, FileMode.Create))
+                {
+                    await post.ImageFile.CopyToAsync(fileStream);
+                }
+
+                //insert record
+
+
                 try
                 {
                     _context.Update(post);
@@ -144,6 +171,8 @@ namespace LiberArs.Controllers
         }
 
         // GET: Post/Delete/5
+        [Authorize]
+
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -165,6 +194,8 @@ namespace LiberArs.Controllers
         // POST: Post/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize]
+
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var post = await _context.Posts.FindAsync(id);
