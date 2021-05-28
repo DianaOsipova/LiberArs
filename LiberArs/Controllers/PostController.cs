@@ -29,11 +29,18 @@ namespace LiberArs.Controllers
 
         public async Task<IActionResult> Index()
         {
+
             var userContext = _context.Posts.Include(p => p.User);
             User user = await _context.Users.FirstOrDefaultAsync(u => u.Email == User.Identity.Name);
-            var posts = _context.Posts.Where(p => p.UserId == user.Id);
-            //return View(await userContext.ToListAsync());
-            return View(await posts.ToListAsync());
+            if(user != null)
+            {
+                var posts = _context.Posts.Where(p => p.UserId == user.Id);
+                //return View(await userContext.ToListAsync());
+                ViewBag.Name = user.Email;
+                return View(await posts.ToListAsync());
+            }
+            return View();
+            
         }
 
         // GET: Post/Details/5
@@ -72,7 +79,7 @@ namespace LiberArs.Controllers
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken] //это защита от подделки межсайтовых запростов( мол когда с другого сайта идёт запрос к тебе на сайт)
-        public async Task<IActionResult> Create([Bind("PostId,Theme,ImageFile,DateTime")] Post post)
+        public async Task<IActionResult> Create([Bind("PostId,Theme,ImageFile,DateTime,Description")] Post post)
         {
             if (ModelState.IsValid)
             {
@@ -124,7 +131,7 @@ namespace LiberArs.Controllers
         [ValidateAntiForgeryToken]
         [Authorize]
 
-        public async Task<IActionResult> Edit(int id, [Bind("PostId,Theme,ImageFile,DateTime, UserId")] Post post)
+        public async Task<IActionResult> Edit(int id, [Bind("PostId,Theme,ImageFile,DateTime,Description, UserId")] Post post)
         {
             if (id != post.PostId)
             {
@@ -134,19 +141,22 @@ namespace LiberArs.Controllers
             if (ModelState.IsValid)
             {
 
-                //save image to wwwroot/image
-                string wwwRootPath = _hostEnvironment.WebRootPath;
-                string fileName = Path.GetFileNameWithoutExtension(post.ImageFile.FileName);
-                string extension = Path.GetExtension(post.ImageFile.FileName);
-                post.ImageName = fileName = fileName + DateTime.Now.ToString("yymmssfff") + extension;
-                string path = Path.Combine(wwwRootPath + "/Image/", fileName);
-                using (var fileStream = new FileStream(path, FileMode.Create))
+                if(post.ImageFile != null)
                 {
-                    await post.ImageFile.CopyToAsync(fileStream);
+                    //save image to wwwroot/image
+                    string wwwRootPath = _hostEnvironment.WebRootPath;
+                    string fileName = Path.GetFileNameWithoutExtension(post.ImageFile.FileName);
+                    string extension = Path.GetExtension(post.ImageFile.FileName);
+                    post.ImageName = fileName = fileName + DateTime.Now.ToString("yymmssfff") + extension;
+                    string path = Path.Combine(wwwRootPath + "/Image/", fileName);
+                    using (var fileStream = new FileStream(path, FileMode.Create))
+                    {
+                        await post.ImageFile.CopyToAsync(fileStream);
+                    }
+
+                    //insert record
+
                 }
-
-                //insert record
-
 
                 try
                 {

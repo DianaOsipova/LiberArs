@@ -8,6 +8,7 @@ namespace LiberArs.ViewModels
         public string UserName { get; set; }
 
         [Required(ErrorMessage = "Не указан Email")]
+        [EmailAddress(ErrorMessage = "Введите настоящий Email")]
         public string Email { get; set; }
 
         [Required(ErrorMessage = "Не указан пароль")]
@@ -19,3 +20,4 @@ namespace LiberArs.ViewModels
         public string ConfirmPassword { get; set; }
     }
 }
+

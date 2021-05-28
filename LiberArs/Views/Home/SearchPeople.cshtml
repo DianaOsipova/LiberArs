@@ -1,47 +1,15 @@
-﻿@model IEnumerable<LiberArs.Models.Post>
+﻿@model IEnumerable<String>
 @{
     ViewData["Title"] = "Поиск людей";
 }
 
 
 <table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Theme)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ImageName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DateTime)
-            </th>
-            @*<th>
-                    @Html.DisplayNameFor(model => model.User)
-                </th>*@
-            <th></th>
-        </tr>
-    </thead>
+   
     <tbody>
-        @foreach (var item in Model)
+        @foreach (string item in Model)
         {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Theme)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.ImageName)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.DateTime)
-                </td>
-                @*<td>
-                        @Html.DisplayFor(modelItem => item.User.Id)
-                    </td>*@
-                <td>
-                    <a asp-action="Details" asp-controller="Post" asp-route-id="@item.PostId">Details</a>
-                </td>
-            </tr>
+            <a asp-action="WatchPost" asp-controller="Home" asp-route-email="@item">@item</a>
         }
     </tbody>
 </table>

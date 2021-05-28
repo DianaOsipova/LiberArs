@@ -6,6 +6,9 @@ using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.Hosting;
+using System.IO;
+
 
 
 
@@ -31,12 +34,18 @@ namespace LiberArs.Controllers
         {
             if(email != null)
             {
-                User user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
-                
-                if(user != null)
+                List<User> users = await _context.Users.Where(u => u.Email.Contains(email)).ToListAsync();
+                               
+                if(users != null)
                 {
-                    var posts = _context.Posts.Where(u => u.UserId == user.Id);
-                    return View(posts);
+                    List<string> emails = new List<string>();
+
+                    foreach(User u in users)
+                    {
+                        emails.Add(u.Email);
+                    }
+
+                    return View(emails);
                 }
             }
 
@@ -44,6 +53,23 @@ namespace LiberArs.Controllers
             return RedirectToAction("Index");
             
 
+        }
+
+        public async Task<IActionResult> WatchPost(string email)
+        {
+            if(email != null)
+            {
+                User user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+                if (user != null)
+                {
+                    List<Post> posts = await _context.Posts.Where(p => p.UserId == user.Id).ToListAsync();
+                    ViewBag.email = email;
+                    return View(posts);
+                }
+                 
+
+            }
+            return RedirectToAction("Index");
         }
     }
 }

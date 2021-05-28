@@ -14,19 +14,23 @@ namespace LiberArs.Models
         public int PostId { get; set; }
 
         [Column(TypeName = "nvarchar(50)")]
+        [Display(Name = "Тема")]
+        [Required(ErrorMessage = "Введите тему")]
         public string Theme { get; set; }
       
-
-       
-
         [Column(TypeName = "nvarchar(100)")]
-        [Display(Name = "Image Name")]
+        [Display(Name = "Название картинки")]
         public string ImageName { get; set; }
 
+        [Required(ErrorMessage = "Добавьте описание")]
+        [Display(Name = "Описание")]
+        public string Description { get; set; }
+
         [NotMapped]
-        [Display(Name = "Upload")]
+        [Display(Name = "Загрузить")]
         public IFormFile ImageFile { get; set; }
 
+        [Display(Name = "Дата публикации")]
         public DateTime DateTime { get; set; }
 
      
